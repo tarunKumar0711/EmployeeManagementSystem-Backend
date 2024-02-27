@@ -5,9 +5,12 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/employees")
+@CrossOrigin("*")
 public class EmployeeController {
 	
 	private final EmployeeService employeeService;
@@ -35,8 +39,8 @@ public class EmployeeController {
 		
 	}
 	
-	@GetMapping("/getEmployeeById")
-	public ResponseEntity<?> getEmployeeById(@RequestParam Long employeeId){
+	@GetMapping("/getEmployeeById/{id}")
+	public ResponseEntity<?> getEmployeeById(@PathVariable("id")Long employeeId){
 		EmployeeDto employeeDto = employeeService.getEmployeeById(employeeId);
 		return ResponseEntity.status(HttpStatus.OK).body(employeeDto);		
 	}
@@ -47,11 +51,18 @@ public class EmployeeController {
 		return ResponseEntity.status(HttpStatus.OK).body(employeeList);
 	}
 	
-	@DeleteMapping("/deleteEmployeeById")
-	public ResponseEntity<?> deleteEmployeeById(Long employeeId){
+	@DeleteMapping("/deleteEmployeeById/{id}")
+	public ResponseEntity<?> deleteEmployeeById(@PathVariable("id") Long employeeId){
 		employeeService.deleteEmployeeById(employeeId);
 		return ResponseEntity.status(HttpStatus.OK).body("Employee Deleted with given id :"+employeeId);
 	}
+	
+	 @PutMapping("{id}")
+	  public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Long employeeId,
+	                                                      @RequestBody EmployeeDto updatedEmployee){
+	          EmployeeDto employeeDto = employeeService.updateEmployee(employeeId, updatedEmployee);
+	          return ResponseEntity.ok(employeeDto);
+	    }
 	
 	
 }
