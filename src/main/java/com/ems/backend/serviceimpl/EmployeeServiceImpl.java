@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.ems.backend.dto.EmployeeDto;
 import com.ems.backend.exception.ResourceNotFoundException;
 import com.ems.backend.mapper.EmployeeMapper;
+import com.ems.backend.model.Department;
 import com.ems.backend.model.Employee;
+import com.ems.backend.repos.DepartmentRepository;
 import com.ems.backend.repos.EmployeeRepository;
 import com.ems.backend.service.EmployeeService;
 
@@ -23,9 +25,14 @@ public class EmployeeServiceImpl implements EmployeeService{
 	
 	private final EmployeeRepository employeeRepository;
 
+	private final DepartmentRepository departmentRepository;
+	
 	@Override
 	public EmployeeDto createEmployee(EmployeeDto employeeDto) {
 		Employee employee = EmployeeMapper.mapToEmployee(employeeDto);
+		Department department = departmentRepository.findById(employeeDto.getDepartmentId())
+				.orElseThrow(() -> new ResourceNotFoundException("Department does not exist with id :"+ employeeDto.getDepartmentId()));
+		employee.setDepartment(department);
 		Employee savedEmployee = employeeRepository.save(employee);
 		return EmployeeMapper.mapToEmployeeDto(savedEmployee);
 	}
@@ -62,6 +69,10 @@ public class EmployeeServiceImpl implements EmployeeService{
 	        employee.setLastName(updatedEmployee.getLastName());
 	        employee.setEmail(updatedEmployee.getEmail());
 
+	        Department department = departmentRepository.findById(updatedEmployee.getDepartmentId())
+					.orElseThrow(() -> new ResourceNotFoundException("Department does not exist with id :"+ updatedEmployee.getDepartmentId()));
+			employee.setDepartment(department);
+			
 	        Employee updatedEmployeeObj = employeeRepository.save(employee);
 
 	        return EmployeeMapper.mapToEmployeeDto(updatedEmployeeObj);
